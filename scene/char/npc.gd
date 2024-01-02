@@ -9,10 +9,11 @@ onready var agent = $agent
 export var desEnmDistRanged = [64,80]
 export var desEnmDistMelee = [25,30] # squared on ready
 onready var enemyPos = global_position
-var remAmmo = 8
+var remAmmo = 0
 onready var wpn = $wpn.get_child(0)
 var curDesDist = desEnmDistMelee
 export var inaccuracy = 10
+var meleeDist = 48*48
 
 func minusRemAmmo(): # on reload fully & round loaded
 	if wpn.reloadPerRound:
@@ -22,6 +23,7 @@ func minusRemAmmo(): # on reload fully & round loaded
 	print(str(remAmmo))
 
 func _ready():
+	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
 	wpn.inaccuracy += inaccuracy
 	wpn.connect("reloadedFully",self,"minusRemAmmo")
 	wpn.connect("roundLoaded",self,"minusRemAmmo")
@@ -36,6 +38,7 @@ func _ready():
 	if hp == -1:
 		hp = mHp
 	
+	$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
 
 func _physics_process(delta):
 	$vision.look_at(General.player.global_position)
@@ -44,7 +47,7 @@ func _physics_process(delta):
 		enemyPos = General.player.global_position
 		getNextAttackAction()
 		wpn.look_at(enemyPos)
-		$wpn.position = Vector2(14,-3).rotated($Sprite.rotation)
+		$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
 		
 	if !agent.is_navigation_finished():
 		$Sprite.look_at(tPos)
@@ -65,17 +68,28 @@ func die():
 
 func getAttackPreference():
 	var pref = "melee"
-	if global_position.distance_squared_to(enemyPos)>(32^2): # dist great
-		if remAmmo>0 or wpn.ammo>0:
-			pref = "ranged"
-			curDesDist = desEnmDistRanged
-		elif remAmmo<=0: # no ammo
-			if wpn.throwable:
-				pref = "throw"
+	if global_position.distance_squared_to(enemyPos)>=(meleeDist): # dist great
+		if wpn.ranged:
+			if remAmmo>0 or wpn.ammo>0:
+				pref = "ranged"
 				curDesDist = desEnmDistRanged
-	if pref == "melee":
+			elif remAmmo<=0: # no ammo
+				if wpn.throwable && global_position.distance_squared_to(enemyPos)>=(meleeDist):
+					pref = "throw"
+					curDesDist = desEnmDistRanged
+				elif wpn.melee:
+					pref = "melee"
+					curDesDist = desEnmDistMelee
+		elif wpn.throwable:
+			pref = "throw"
+			curDesDist = desEnmDistRanged
+		elif wpn.melee:
+			curDesDist = desEnmDistMelee
+			pref = "melee"
+	elif wpn.melee:
+		pref = "melee"
 		curDesDist = desEnmDistMelee
-	print(pref)
+	print(str(sqrt(global_position.distance_squared_to(enemyPos)))+pref)
 	return pref
 
 func getNextAttackAction():
@@ -84,7 +98,7 @@ func getNextAttackAction():
 			"ranged":
 				rangedLoop()
 			"melee":
-				pass
+				meleeLoop()
 			"throw":
 				pass
 
@@ -92,7 +106,9 @@ func onEndReload():
 	getNextAttackAction()
 
 func meleeLoop():
-	pass # check if in range
+	if global_position.distance_squared_to(enemyPos)<=meleeDist:
+		wpn.melee()
+		$actionTimer.start()
 	# attack, cooldown
 	# repeat
 	# since based on preference, will update preference based on distance

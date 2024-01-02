@@ -1,10 +1,10 @@
 extends Sprite
 class_name Weapon
 
-export var throwable = false
-export var melee = false
+export var throwable = true
+export var melee = true
 export var ranged = true
-export var meleeDmg = 10
+export var meleeDmg = 15
 export var rangedDmg = 50
 export var throwDmg = 10
 export var meleeCooldown = 1
@@ -19,6 +19,7 @@ export var proj : PackedScene = preload("res://scene/misc/bullet.tscn")
 export var inaccuracy = 10 # degrees
 export var cockable = false
 export var cocked = false
+export var mproj : PackedScene = preload("res://scene/misc/bullet.tscn")
 
 signal reloadedFully
 signal roundLoaded
@@ -27,6 +28,7 @@ signal fired
 signal meleed
 signal thrown
 signal rCooldownOver
+signal mCooldownOver
 
 func areTimersStopped():
 	return $rangedTimer.is_stopped() && $reloadTimer.is_stopped() && $meleeTimer.is_stopped()
@@ -70,6 +72,18 @@ func fire():
 			General.addProj(np)
 		$rangedTimer.start()
 
+func melee():
+	if areTimersStopped() && melee:
+		emit_signal("meleed")
+		var np = mproj.instance()
+		np.deathTime = 0.1
+		np.global_position = global_position
+		np.global_rotation_degrees = global_rotation_degrees
+		np.damage = meleeDmg
+		np.visible = false
+		General.addProj(np)
+		$meleeTimer.start()
+		print("meleed")
 
 func _on_rangedTimer_timeout():
 	emit_signal("rCooldownOver")
@@ -77,3 +91,7 @@ func _on_rangedTimer_timeout():
 
 func _on_reloadTimer_timeout():
 	reloadEnd()
+
+
+func _on_meleeTimer_timeout():
+	emit_signal("mCooldownOver")

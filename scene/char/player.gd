@@ -20,11 +20,17 @@ func _ready():
 		hp = mHp
 	wpn.connect("rCooldownOver",self,"rangedCdOver")
 	wpn.connect("reloadedFully",self,"rangedCdOver")
+	wpn.connect("mCooldownOver",self,"meleeCdOver")
 	connect("hpChanged",self,"updUi")
+	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
 
 func rangedCdOver():
 	if Input.get_action_strength("fire")>0:
 		wpn.fire()
+
+func meleeCdOver():
+	if Input.get_action_strength("melee")>0:
+		wpn.melee()
 
 func die():
 	get_tree().reload_current_scene()
@@ -34,6 +40,8 @@ func _input(event):
 		wpn.fire()
 	if event.is_action_pressed("reload"):
 		wpn.reload()
+	if event.is_action_pressed("melee"):
+		wpn.melee()
 
 func takeDamage(amount:int):
 	hp -= amount
@@ -43,7 +51,7 @@ func takeDamage(amount:int):
 		emit_signal("hpChanged")
 
 func updUi():
-	pass
+	print("plr hp "+str(hp)+"/"+str(mHp))
 
 func _physics_process(delta):
 	look_at(get_global_mouse_position())

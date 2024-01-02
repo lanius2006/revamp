@@ -4,6 +4,7 @@
 [ext_resource path="res://scene/wpn/wpn.gd" type="Script" id=2]
 
 [node name="wpn" type="Sprite"]
+scale = Vector2( 0.75, 0.75 )
 texture = ExtResource( 1 )
 script = ExtResource( 2 )
 
@@ -21,3 +22,4 @@ one_shot = true
 
 [connection signal="timeout" from="reloadTimer" to="." method="_on_reloadTimer_timeout"]
 [connection signal="timeout" from="rangedTimer" to="." method="_on_rangedTimer_timeout"]
+[connection signal="timeout" from="meleeTimer" to="." method="_on_meleeTimer_timeout"]
