@@ -10,10 +10,11 @@ export var desEnmDistRanged = [64,80]
 export var desEnmDistMelee = [25,30] # squared on ready
 onready var enemyPos = global_position
 var remAmmo = 0
-onready var wpn = $wpn.get_child(0)
+onready var wpn = null
 var curDesDist = desEnmDistMelee
 export var inaccuracy = 10
-var meleeDist = 48*48
+var meleeDist = 38*38
+export var weaponScene : PackedScene = preload("res://scene/wpn/wpn.tscn")
 
 func minusRemAmmo(): # on reload fully & round loaded
 	if wpn.reloadPerRound:
@@ -23,6 +24,10 @@ func minusRemAmmo(): # on reload fully & round loaded
 	print(str(remAmmo))
 
 func _ready():
+	agent.set_navigation(General.nav)
+	var nwpn = weaponScene.instance()
+	$wpn/Node2D.add_child(nwpn)
+	wpn = $wpn/Node2D.get_child(0)
 	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
 	wpn.inaccuracy += inaccuracy
 	wpn.connect("reloadedFully",self,"minusRemAmmo")

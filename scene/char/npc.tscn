@@ -2,7 +2,7 @@
 
 [ext_resource path="res://spr/char/basic-enemy.png" type="Texture" id=1]
 [ext_resource path="res://scene/char/npc.gd" type="Script" id=2]
-[ext_resource path="res://scene/wpn/wpn.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scene/wpn/sword.tscn" type="PackedScene" id=3]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 5.0
@@ -13,7 +13,7 @@ radius = 6.0
 [sub_resource type="Animation" id=3]
 length = 0.001
 tracks/0/type = "value"
-tracks/0/path = NodePath("wpn/wpn:position")
+tracks/0/path = NodePath("wpn/Node2D:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -29,7 +29,7 @@ tracks/0/keys = {
 resource_name = "meleeAttack"
 length = 0.2
 tracks/0/type = "value"
-tracks/0/path = NodePath("wpn/wpn:position")
+tracks/0/path = NodePath("wpn/Node2D:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
@@ -43,6 +43,7 @@ tracks/0/keys = {
 
 [node name="npc" type="KinematicBody2D"]
 script = ExtResource( 2 )
+weaponScene = ExtResource( 3 )
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 1 )
@@ -70,7 +71,7 @@ shape = SubResource( 2 )
 [node name="wpn" type="Node2D" parent="."]
 position = Vector2( 14, -3 )
 
-[node name="wpn" parent="wpn" instance=ExtResource( 3 )]
+[node name="Node2D" type="Node2D" parent="wpn"]
 
 [node name="actionTimer" type="Timer" parent="."]
 wait_time = 0.2
