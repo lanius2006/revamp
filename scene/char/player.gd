@@ -23,6 +23,19 @@ func _ready():
 	wpn.connect("mCooldownOver",self,"meleeCdOver")
 	connect("hpChanged",self,"updUi")
 	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
+	wpn.connect("fired",self,"addRecoil",[wpn.recoilDuration,wpn.reocoilStrength])
+
+func addRecoil(dur=0.1,strength=2000):
+	addKnockback(dur,strength,deg2rad(global_rotation_degrees+180))
+
+func addKnockback(dur=0.1,strength=2000,dir=global_rotation):
+	var nk = preload("res://scene/misc/knockback.tscn").instance()
+	nk.strength = strength
+	nk.duration = dur
+	nk.direction = dir
+	add_child(nk)
+	print(str(dir))
+	print(str(nk.direction))
 
 func rangedCdOver():
 	if Input.get_action_strength("fire")>0:

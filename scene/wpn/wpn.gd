@@ -18,6 +18,8 @@ export var inaccuracy = 10 # degrees
 export var cockable = false
 export var cocked = false
 export var mproj : PackedScene = preload("res://scene/misc/bullet.tscn")
+export var recoilDuration = 0.2
+export var reocoilStrength = 5000
 
 signal reloadedFully
 signal roundLoaded
