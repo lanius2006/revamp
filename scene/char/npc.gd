@@ -73,16 +73,9 @@ func getAttackPreference():
 			if remAmmo>0 or wpn.ammo>0:
 				pref = "ranged"
 				curDesDist = desEnmDistRanged
-			elif remAmmo<=0: # no ammo
-				if wpn.throwable && global_position.distance_squared_to(enemyPos)>=(meleeDist):
-					pref = "throw"
-					curDesDist = desEnmDistRanged
-				elif wpn.melee:
-					pref = "melee"
-					curDesDist = desEnmDistMelee
-		elif wpn.throwable:
-			pref = "throw"
-			curDesDist = desEnmDistRanged
+			elif remAmmo<=0 && wpn.melee: # no ammo
+				pref = "melee"
+				curDesDist = desEnmDistMelee
 		elif wpn.melee:
 			curDesDist = desEnmDistMelee
 			pref = "melee"
@@ -94,13 +87,10 @@ func getAttackPreference():
 
 func getNextAttackAction():
 	if $actionTimer.is_stopped():
-		match getAttackPreference(): # get attack action based on current preference
-			"ranged":
-				rangedLoop()
-			"melee":
-				meleeLoop()
-			"throw":
-				pass
+		if getAttackPreference() == "ranged":
+			rangedLoop()
+		else:
+			meleeLoop()
 
 func onEndReload():
 	getNextAttackAction()

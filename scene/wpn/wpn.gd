@@ -1,12 +1,10 @@
 extends Sprite
 class_name Weapon
 
-export var throwable = true
 export var melee = true
 export var ranged = true
 export var meleeDmg = 15
 export var rangedDmg = 50
-export var throwDmg = 10
 export var meleeCooldown = 1
 export var rangedCooldown = 0.5
 export var maxAmmo = 8
@@ -26,7 +24,6 @@ signal roundLoaded
 signal reloadStarted
 signal fired
 signal meleed
-signal thrown
 signal rCooldownOver
 signal mCooldownOver
 
