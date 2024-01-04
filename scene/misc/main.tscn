@@ -21,7 +21,20 @@ tile_data = PoolIntArray( -917496, 0, 0, -917495, 0, 0, -917494, 0, 0, -917493, 
 [node name="npc" parent="npcs" instance=ExtResource( 3 )]
 position = Vector2( 168, -87 )
 
+[node name="npc2" parent="npcs" instance=ExtResource( 3 )]
+position = Vector2( 204, -90 )
+
+[node name="npc5" parent="npcs" instance=ExtResource( 3 )]
+position = Vector2( 217, -95 )
+
+[node name="npc3" parent="npcs" instance=ExtResource( 3 )]
+position = Vector2( 192, -93 )
+
+[node name="npc4" parent="npcs" instance=ExtResource( 3 )]
+position = Vector2( 203, -106 )
+
 [node name="projectiles" type="Node2D" parent="."]
 
 [node name="player" parent="." instance=ExtResource( 1 )]
+process_priority = -1
 position = Vector2( 16, -1 )

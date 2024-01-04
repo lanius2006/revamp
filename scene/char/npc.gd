@@ -6,8 +6,8 @@ export var moveSpeed = 1000
 var velocity = Vector2.ZERO
 onready var tPos = global_position
 onready var agent = $agent
-export var desEnmDistRanged = [64,80]
-export var desEnmDistMelee = [25,30] # squared on ready
+export var desEnmDistRanged = [64*64,80*80]
+export var desEnmDistMelee = [25*25,30*30] # squared on ready
 onready var enemyPos = global_position
 var remAmmo = 0
 onready var wpn = null
@@ -34,12 +34,13 @@ func _ready():
 	wpn.connect("roundLoaded",self,"minusRemAmmo")
 #	wpn.connect("fired",self,"onEndReload")
 #	wpn.connect()
-	for i in 2:
-		desEnmDistMelee[i] *= desEnmDistMelee[i]
-		desEnmDistRanged[i] *= desEnmDistRanged[i]
+#	for i in 2:
+#		desEnmDistMelee[i] *= desEnmDistMelee[i]
+#		desEnmDistRanged[i] *= desEnmDistRanged[i]
 	curDesDist = desEnmDistMelee
 	
-	agent.set_target_location(tPos)
+	agent.set_target_location(Vector2(200,0))
+	enemyPos = Vector2(200,0)
 	if hp == -1:
 		hp = mHp
 	
@@ -53,7 +54,7 @@ func _physics_process(delta):
 		getNextAttackAction()
 		wpn.look_at(enemyPos)
 		$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
-		
+	
 	if !agent.is_navigation_finished():
 		$Sprite.look_at(tPos)
 		tPos = agent.get_next_location()
@@ -64,7 +65,7 @@ func _physics_process(delta):
 		velocity = move_and_slide(to_local(tPos).normalized()*delta*-moveSpeed)
 	elif Utils.in_range(curDesDist[0], curDesDist[1],global_position.distance_squared_to(enemyPos)): # in range
 		velocity = Vector2.ZERO
-	elif global_position.distance_squared_to(enemyPos) > curDesDist[1]:
+	elif global_position.distance_squared_to(enemyPos) > curDesDist[1]: # farther than desired
 		velocity = move_and_slide(to_local(tPos).normalized()*delta*moveSpeed)
 	
 
