@@ -16,6 +16,9 @@ export var inaccuracy = 10
 var meleeDist = 38*38
 export var weaponScene : PackedScene = preload("res://scene/wpn/wpn.tscn")
 
+var enmVisible = false
+var combatMode = false
+
 func minusRemAmmo(): # on reload fully & round loaded
 	if wpn.reloadPerRound:
 		remAmmo -= 1
@@ -38,17 +41,26 @@ func _ready():
 #		desEnmDistMelee[i] *= desEnmDistMelee[i]
 #		desEnmDistRanged[i] *= desEnmDistRanged[i]
 	curDesDist = desEnmDistMelee
-	
-	agent.set_target_location(Vector2(200,0))
-	enemyPos = Vector2(200,0)
 	if hp == -1:
 		hp = mHp
 	
 	$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
+	randSpot()
+
+func randSpot():
+	var map = get_tree().current_scene.get_node("Navigation2D/TileMap")
+	agent.set_target_location(map.map_to_world(
+		Utils.randArrayItem(map.get_used_cells_by_id(1))
+	)+Vector2.ONE*(map.cell_size/2))
 
 func _physics_process(delta):
 	$vision.look_at(General.player.global_position)
 	if $vision.get_collider() is Player:
+		enmVisible = true
+	else:
+		enmVisible = false
+	
+	if enmVisible:
 		agent.set_target_location(General.player.global_position)
 		enemyPos = General.player.global_position
 		getNextAttackAction()
@@ -61,11 +73,14 @@ func _physics_process(delta):
 #		print(str(tPos))
 	
 	
-	if global_position.distance_squared_to(enemyPos) < curDesDist[0]: # closer than desired
-		velocity = move_and_slide(to_local(tPos).normalized()*delta*-moveSpeed)
-	elif Utils.in_range(curDesDist[0], curDesDist[1],global_position.distance_squared_to(enemyPos)): # in range
-		velocity = Vector2.ZERO
-	elif global_position.distance_squared_to(enemyPos) > curDesDist[1]: # farther than desired
+	if enmVisible:
+		if global_position.distance_squared_to(enemyPos) < curDesDist[0]: # closer than desired
+			velocity = move_and_slide(to_local(tPos).normalized()*delta*-moveSpeed)
+		elif Utils.in_range(curDesDist[0], curDesDist[1],global_position.distance_squared_to(enemyPos)): # in range
+			velocity = Vector2.ZERO
+		elif global_position.distance_squared_to(enemyPos) > curDesDist[1]: # farther than desired
+			velocity = move_and_slide(to_local(tPos).normalized()*delta*moveSpeed)
+	else:
 		velocity = move_and_slide(to_local(tPos).normalized()*delta*moveSpeed)
 	
 
