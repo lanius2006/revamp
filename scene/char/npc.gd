@@ -6,18 +6,17 @@ export var moveSpeed = 1000
 var velocity = Vector2.ZERO
 onready var tPos = global_position
 onready var agent = $agent
-export var desEnmDistRanged = [64*64,80*80]
-export var desEnmDistMelee = [25*25,30*30] # squared on ready
+export var desEnmDistRanged = [pow(64,2),pow(38,2)]
+export var desEnmDistMelee = [pow(25,2),pow(30,2)] # squared on ready
 onready var enemyPos = global_position
 var remAmmo = 0
 onready var wpn = null
 var curDesDist = desEnmDistMelee
 export var inaccuracy = 10
-var meleeDist = 38*38
-export var weaponScene : PackedScene = preload("res://scene/wpn/wpn.tscn")
+var meleeDist = pow(38,2)
+export(Array,PackedScene) var weaponScenes = [preload("res://scene/wpn/sword.tscn"),preload("res://scene/wpn/wpn.tscn"),preload("res://scene/wpn/crossbow.tscn")]
 
 var enmVisible = false
-var combatMode = false
 
 func minusRemAmmo(): # on reload fully & round loaded
 	if wpn.reloadPerRound:
@@ -28,7 +27,7 @@ func minusRemAmmo(): # on reload fully & round loaded
 
 func _ready():
 	agent.set_navigation(General.nav)
-	var nwpn = weaponScene.instance()
+	var nwpn = Utils.randArrayItem(weaponScenes).instance()
 	$wpn/Node2D.add_child(nwpn)
 	wpn = $wpn/Node2D.get_child(0)
 	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
@@ -43,6 +42,8 @@ func _ready():
 	curDesDist = desEnmDistMelee
 	if hp == -1:
 		hp = mHp
+	
+	remAmmo = ceil(20*ceil(10/wpn.maxAmmo)) # 2 magazines
 	
 	$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
 	randSpot()
@@ -65,13 +66,12 @@ func _physics_process(delta):
 		enemyPos = General.player.global_position
 		getNextAttackAction()
 		wpn.look_at(enemyPos)
-		$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
 	
 	if !agent.is_navigation_finished():
 		$Sprite.look_at(tPos)
 		tPos = agent.get_next_location()
-#		print(str(tPos))
-	
+		wpn.look_at(tPos)
+	$wpn.position = Vector2(10,-3).rotated($Sprite.rotation)
 	
 	if enmVisible:
 		if global_position.distance_squared_to(enemyPos) < curDesDist[0]: # closer than desired
@@ -103,7 +103,6 @@ func getAttackPreference():
 	elif wpn.melee:
 		pref = "melee"
 		curDesDist = desEnmDistMelee
-	print(str(sqrt(global_position.distance_squared_to(enemyPos)))+pref)
 	return pref
 
 func getNextAttackAction():
@@ -126,7 +125,6 @@ func meleeLoop():
 
 func rangedLoop():
 	if wpn.ammo<=0: # no ammo in gun
-		print("reload")
 		wpn.reload()
 		$actionTimer.start()
 		# wait for reload, recall
@@ -136,7 +134,6 @@ func rangedLoop():
 				wpn.fire()
 			else:
 				wpn.cocked = true
-				print("cocked!")
 				$actionTimer.start()
 		else: # non cockable
 			wpn.fire()

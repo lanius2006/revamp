@@ -9,6 +9,7 @@ load_path = "res://.import/luger.png-b03e873cc79062110623358a27093727.stex"
 scale = Vector2( 0.75, 0.75 )
 texture = SubResource( 1 )
 script = ExtResource( 2 )
+reloadTime = 3.0
 
 [node name="shootPos" type="Position2D" parent="."]
 position = Vector2( 5, -1 )

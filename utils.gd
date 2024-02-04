@@ -10,7 +10,7 @@ func randArrayItem(array:Array):
 	var res = null
 	rng.randomize()
 	if !array.size()==0:
-		res = array[rng.randi_range(0,array.size()-1)]
+		res = array[rng.randi() % array.size()]
 	return res
 
 func randBool():

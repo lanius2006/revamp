@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scene/wpn/wpn.tscn" type="PackedScene" id=1]
+[ext_resource path="res://spr/wpn/crossbow.png" type="Texture" id=2]
+[ext_resource path="res://scene/misc/bolt.tscn" type="PackedScene" id=3]
+
+[node name="crossbow" instance=ExtResource( 1 )]
+texture = ExtResource( 2 )
+meleeDmg = 8
+rangedDmg = 20
+meleeCooldown = 1.2
+rangedCooldown = 0.1
+maxAmmo = 1
+reloadTime = 2.0
+proj = ExtResource( 3 )
+inaccuracy = 8
+recoilDuration = 0.1
+reocoilStrength = 500
+
+[node name="shootPos" parent="." index="0"]
+position = Vector2( 4, 0 )

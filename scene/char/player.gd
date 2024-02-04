@@ -24,6 +24,10 @@ func _ready():
 	connect("hpChanged",self,"updUi")
 	wpn.connect("meleed",$AnimationPlayer,"play",["meleeAttack"])
 	wpn.connect("fired",self,"addRecoil",[wpn.recoilDuration,wpn.reocoilStrength])
+	wpn.connect("fired",self,"updUi")
+	wpn.connect("roundLoaded",self,"updUi")
+	wpn.connect("reloadedFully",self,"updUi")
+	updUi()
 
 func addRecoil(dur=0.1,strength=2000):
 	addKnockback(dur,strength,deg2rad(global_rotation_degrees+180))
@@ -64,7 +68,8 @@ func takeDamage(amount:int):
 		emit_signal("hpChanged")
 
 func updUi():
-	print("plr hp "+str(hp)+"/"+str(mHp))
+	$Camera2D/ui/ui/HBoxContainer/hpL.text = "HP: "+str(hp)+"/"+str(mHp)
+	$Camera2D/ui/ui/HBoxContainer/ammoL.text = "Ammo: "+str(wpn.ammo)+"/"+str(wpn.maxAmmo)
 
 func _physics_process(delta):
 	look_at(get_global_mouse_position())
